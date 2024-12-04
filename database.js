@@ -1,4 +1,3 @@
-const { resolveBase64 } = require('discord.js');
 const sqlite3 = require('sqlite3');
 
 const db = new sqlite3.Database(process.env.DATABASE_FILE, sqlite3.OPEN_READWRITE, (err) => {
@@ -9,7 +8,7 @@ const db = new sqlite3.Database(process.env.DATABASE_FILE, sqlite3.OPEN_READWRIT
   console.log('Connected to the database.');
 });
 
-db.run("CREATE TABLE IF NOT EXISTS balances(user_id TEXT PRIMARY KEY, balance INTEGER DEFAULT 0)", (err) => {
+db.run("CREATE TABLE IF NOT EXISTS balances(user_id TEXT PRIMARY KEY, balance INTEGER DEFAULT 0);", (err) => {
   if (err) {
     console.error("failed to create balances table");
     console.error(err.message);
@@ -20,7 +19,7 @@ db.run("CREATE TABLE IF NOT EXISTS balances(user_id TEXT PRIMARY KEY, balance IN
 
 const addNewUser = (user_id) => {
   return new Promise((resolve, reject) => {
-    db.run("INSERT INTO balances (user_id) VALUES (?)", [user_id], (err) => {
+    db.run("INSERT INTO balances (user_id) VALUES (?);", [user_id], (err) => {
       if (err) {
         reject("failed to add new user")
         return;
@@ -46,9 +45,21 @@ const getUserBalance = (user_id) => {
   });
 };
 
+const setUserBalance = (user_id, balance) => {
+  return new Promise((resolve, reject) => {
+    db.run("UPDATE balances SET balance = ? WHERE user_id = ?;", [balance, user_id], (err) => {
+      if (err) {
+        reject("failed to set user balance");
+        return;
+      }
+      resolve();
+    });
+  });
+};
+
 const addAmountToUserBalance = (user_id, amount) => {
   return new Promise((resolve, reject) => {
-    db.run("UPDATE balances SET balance = balance + ? WHERE user_id = ?", [amount, user_id], (err) => {
+    db.run("UPDATE balances SET balance = balance + ? WHERE user_id = ?;", [amount, user_id], (err) => {
       if (err) {
         reject("failed to add amount to user balance");
         return;
@@ -58,4 +69,9 @@ const addAmountToUserBalance = (user_id, amount) => {
   });
 };
 
-module.exports = { addNewUser, getUserBalance, addAmountToUserBalance };
+module.exports = {
+  addNewUser,
+  getUserBalance,
+  addAmountToUserBalance,
+  setUserBalance,
+};
