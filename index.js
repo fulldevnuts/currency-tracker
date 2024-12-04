@@ -34,9 +34,14 @@ client.once(Events.ClientReady, readyClient => {
         .setRequired(true)
     );
 
+  const balance = new SlashCommandBuilder()
+    .setName("balance")
+    .setDescription("Shows your balance");
+
   client.application.commands.create(ping, DISCORD_SERVER_ID);
   client.application.commands.create(add, DISCORD_SERVER_ID);
   client.application.commands.create(set, DISCORD_SERVER_ID);
+  client.application.commands.create(balance, DISCORD_SERVER_ID);
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -71,6 +76,22 @@ client.on(Events.InteractionCreate, async (interaction) => {
     try {
       await setUserBalance(user_id, amount);
       interaction.reply(`Your balance has been set to ${amount}`);
+    } catch (err) {
+      console.error(err);
+    }
+    
+    return;
+  }
+
+  if (interaction.commandName === "balance") {
+    const user_id = interaction.user.id;
+    try {
+      const balance = await getUserBalance(user_id);
+      if(isNaN(balance)) {
+        balance = 0;
+        await addNewUser(user_id);
+      }
+      interaction.reply(`Your balance is ${balance}`);
     } catch (err) {
       console.error(err);
     }
