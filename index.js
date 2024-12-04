@@ -3,6 +3,8 @@ const { Client, Events, GatewayIntentBits, SlashCommandBuilder } = require("disc
 require("dotenv").config()
 const DISCORD_SERVER_ID = process.env.DISCORD_SERVER_ID;
 
+const { addNewUser, getUserBalance, addAmountToUserBalance } = require("./database.js");
+
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.once(Events.ClientReady, readyClient => {
@@ -26,7 +28,7 @@ client.once(Events.ClientReady, readyClient => {
   client.application.commands.create(add, DISCORD_SERVER_ID);
 });
 
-client.on(Events.InteractionCreate, interaction => {
+client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === "ping") {
@@ -36,7 +38,19 @@ client.on(Events.InteractionCreate, interaction => {
 
   if (interaction.commandName === "add") {
     const amount = interaction.options.getInteger("amount");
-    interaction.reply(`${amount} addedd to your balance!`);
+    const user_id = interaction.user.id;
+    try {
+      const balance = await getUserBalance(user_id);
+      if(isNaN(balance)) {
+        balance = 0;
+        await addNewUser(user_id);
+      }
+      await addAmountToUserBalance(user_id, amount);
+      interaction.reply(`${amount} addedd to your balance! New total is ${balance+amount}`);
+    } catch (err) {
+      console.error(err);
+    }
+    
     return;
   }
 
