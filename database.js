@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3');
 
-const db = new sqlite3.Database(process.env.DATABASE_FILE, sqlite3.OPEN_READWRITE, (err) => {
+const db = new sqlite3.Database(process.env.DATABASE_FILE, (err) => {
   if (err) {
     console.error(err.message);
     return;
@@ -8,7 +8,7 @@ const db = new sqlite3.Database(process.env.DATABASE_FILE, sqlite3.OPEN_READWRIT
   console.log('Connected to the database.');
 });
 
-db.run("CREATE TABLE IF NOT EXISTS balances(user_id TEXT PRIMARY KEY, balance INTEGER DEFAULT 0);", (err) => {
+db.run("CREATE TABLE IF NOT EXISTS balances(user_id TEXT, channel_id TEXT, balance INTEGER DEFAULT 0, PRIMARY KEY(user_id, channel_id));", (err) => {
   if (err) {
     console.error("failed to create balances table");
     console.error(err.message);
