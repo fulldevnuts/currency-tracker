@@ -28,7 +28,7 @@ const handler = async (interaction) => {
   const user = interaction.options.getUser("user");
   const channel_id = interaction.channelId;
   try {
-    const balance = await getUserBalance(user.id, channel_id);
+    let balance = await getUserBalance(user.id, channel_id);
     if(isNaN(balance)) {
       balance = 0;
       await addNewEntry(user.id, channel_id);
