@@ -10,7 +10,7 @@ const handler = async (interaction) => {
   const user_id = interaction.user.id;
   const channel_id = interaction.channelId;
   try {
-    const balance = await getUserBalance(user_id, channel_id);
+    let balance = await getUserBalance(user_id, channel_id);
     if(isNaN(balance)) {
       balance = 0;
       await addNewEntry(user_id, channel_id);
