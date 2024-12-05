@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { addAmountToUserBalance, addNewUser, getUserBalance } = require("../database");
+const { addAmountToUserBalance, getUserBalance, addNewEntry } = require("../database");
 
 const addForUser = new SlashCommandBuilder()
   .setName("add-for-user")
@@ -19,20 +19,21 @@ const addForUser = new SlashCommandBuilder()
 
 const handler = async (interaction) => {
   await interaction.deferReply({ ephemeral: true });
-  const amount = interaction.options.getInteger("amount");
   const isAdmin = interaction.member.permissions.has(process.env.ADMIN_PERMISSION);
   if(!isAdmin) {
     await interaction.editReply("You are not authorized to use this command");
     return;
   }
+  const amount = interaction.options.getInteger("amount");
   const user = interaction.options.getUser("user");
+  const channel_id = interaction.channelId;
   try {
-    const balance = await getUserBalance(user.id);
+    const balance = await getUserBalance(user.id, channel_id);
     if(isNaN(balance)) {
       balance = 0;
-      await addNewUser(user.id);
+      await addNewEntry(user.id, channel_id);
     }
-    await addAmountToUserBalance(user.id, amount);
+    await addAmountToUserBalance(user.id, channel_id, amount);
     await interaction.editReply(`${amount} has been added to ${user.username}'s balance! New total is ${balance+amount}`)
   } catch (err) {
     console.error(err);
