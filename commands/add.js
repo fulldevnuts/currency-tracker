@@ -12,6 +12,7 @@ const add = new SlashCommandBuilder()
   );
 
 const handler = async (interaction) => {
+  await interaction.deferReply({ ephemeral: true });
   const amount = interaction.options.getInteger("amount");
   const user_id = interaction.user.id;
   try {
@@ -21,9 +22,10 @@ const handler = async (interaction) => {
       await addNewUser(user_id);
     }
     await addAmountToUserBalance(user_id, amount);
-    interaction.reply(`${amount} has been added to your balance! New total is ${balance+amount}`);
+    await interaction.editReply(`${amount} has been added to your balance! New total is ${balance+amount}`);
   } catch (err) {
     console.error(err);
+    await interaction.editReply("Failed to add amount to user's balance");
   }
   
   return;

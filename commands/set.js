@@ -6,19 +6,21 @@ const set = new SlashCommandBuilder()
   .setDescription("Sets your balance to a specific amount")
   .addIntegerOption(option =>
     option
-      .setName('amount')
-      .setDescription('The amount to add')
+      .setName("balance")
+      .setDescription("The new balance")
       .setRequired(true)
   );
 
 const handler = async (interaction) => {
-  const amount = interaction.options.getInteger("amount");
+  await interaction.deferReply({ ephemeral: true });
+  const balance = interaction.options.getInteger("balance");
   const user_id = interaction.user.id;
   try {
-    await setUserBalance(user_id, amount);
-    interaction.reply(`Your balance has been set to ${amount}`);
+    await setUserBalance(user_id, balance);
+    await interaction.editReply(`Your balance has been set to ${balance}`);
   } catch (err) {
     console.error(err);
+    await interaction.editReply("Failed to set the new balance");
   }
   
   return;

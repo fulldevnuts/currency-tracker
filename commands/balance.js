@@ -6,6 +6,7 @@ const balance = new SlashCommandBuilder()
   .setDescription("Shows your balance");
 
 const handler = async (interaction) => {
+  await interaction.deferReply({ ephemeral: true });
   const user_id = interaction.user.id;
   try {
     const balance = await getUserBalance(user_id);
@@ -13,9 +14,10 @@ const handler = async (interaction) => {
       balance = 0;
       await addNewUser(user_id);
     }
-    interaction.reply(`Your balance is ${balance}`);
+    await interaction.editReply(`Your balance is ${balance}`);
   } catch (err) {
     console.error(err);
+    await interaction.editReply("Failed to retrive your balance");
   }
   
   return;
