@@ -17,9 +17,9 @@ db.run("CREATE TABLE IF NOT EXISTS balances(user_id TEXT, channel_id TEXT, balan
   console.log('Table created or already exists.');
 });
 
-const addNewUser = (user_id) => {
+const addNewEntry = (user_id, channel_id) => {
   return new Promise((resolve, reject) => {
-    db.run("INSERT INTO balances (user_id) VALUES (?);", [user_id], (err) => {
+    db.run("INSERT INTO balances (user_id, channel_id) VALUES (?, ?);", [user_id, channel_id], (err) => {
       if (err) {
         reject("failed to add new user")
         return;
@@ -29,9 +29,9 @@ const addNewUser = (user_id) => {
   });
 };
 
-const getUserBalance = (user_id) => {
+const getUserBalance = (user_id, channel_id) => {
   return new Promise((resolve, reject) => {
-    db.get("SELECT balance FROM balances WHERE user_id = ?;", [user_id], (err, row) => {
+    db.get("SELECT balance FROM balances WHERE user_id = ? AND channel_id = ?;", [user_id, channel_id], (err, row) => {
       if (err) {
         reject("failed to get user balance");
         return;
@@ -45,9 +45,9 @@ const getUserBalance = (user_id) => {
   });
 };
 
-const setUserBalance = (user_id, balance) => {
+const setUserBalance = (user_id, channel_id, balance) => {
   return new Promise((resolve, reject) => {
-    db.run("UPDATE balances SET balance = ? WHERE user_id = ?;", [balance, user_id], (err) => {
+    db.run("UPDATE balances SET balance = ? WHERE user_id = ? AND channel_id = ?;", [balance, user_id, channel_id], (err) => {
       if (err) {
         reject("failed to set user balance");
         return;
@@ -57,9 +57,9 @@ const setUserBalance = (user_id, balance) => {
   });
 };
 
-const addAmountToUserBalance = (user_id, amount) => {
+const addAmountToUserBalance = (user_id, channel_id, amount) => {
   return new Promise((resolve, reject) => {
-    db.run("UPDATE balances SET balance = balance + ? WHERE user_id = ?;", [amount, user_id], (err) => {
+    db.run("UPDATE balances SET balance = balance + ? WHERE user_id = ? AND channel_id = ?;", [amount, user_id, channel_id], (err) => {
       if (err) {
         reject("failed to add amount to user balance");
         return;
@@ -70,7 +70,7 @@ const addAmountToUserBalance = (user_id, amount) => {
 };
 
 module.exports = {
-  addNewUser,
+  addNewEntry,
   getUserBalance,
   addAmountToUserBalance,
   setUserBalance,
