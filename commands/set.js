@@ -15,8 +15,9 @@ const handler = async (interaction) => {
   await interaction.deferReply({ ephemeral: true });
   const balance = interaction.options.getInteger("balance");
   const user_id = interaction.user.id;
+  const channel_id = interaction.channelId;
   try {
-    await setUserBalance(user_id, balance);
+    await setUserBalance(user_id, channel_id, balance);
     await interaction.editReply(`Your balance has been set to ${balance}`);
   } catch (err) {
     console.error(err);
