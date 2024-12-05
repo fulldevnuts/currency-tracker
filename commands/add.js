@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { addNewUser, getUserBalance, addAmountToUserBalance } = require("../database");
+const { getUserBalance, addAmountToUserBalance, addNewEntry } = require("../database");
 
 const add = new SlashCommandBuilder()
   .setName("add")
@@ -15,13 +15,14 @@ const handler = async (interaction) => {
   await interaction.deferReply({ ephemeral: true });
   const amount = interaction.options.getInteger("amount");
   const user_id = interaction.user.id;
+  const channel_id = interaction.channellId;
   try {
-    const balance = await getUserBalance(user_id);
+    const balance = await getUserBalance(user_id, channel_id);
     if(isNaN(balance)) {
       balance = 0;
-      await addNewUser(user_id);
+      await addNewEntry(user_id, channel_id);
     }
-    await addAmountToUserBalance(user_id, amount);
+    await addAmountToUserBalance(user_id, channel_id, amount);
     await interaction.editReply(`${amount} has been added to your balance! New total is ${balance+amount}`);
   } catch (err) {
     console.error(err);
